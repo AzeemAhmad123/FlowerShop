@@ -1,0 +1,124 @@
+﻿@model FlowerShop.Models.CheckoutViewModel
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+<style>
+    .checkout-wrapper {
+        font-family: 'Playfair Display', 'Work Sans', sans-serif;
+    }
+
+    .checkout-section-title {
+        font-size: 1.4rem;
+        color: #4a2f35;
+        margin-bottom: 1rem;
+    }
+
+    .form-label {
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.12rem;
+        color: #85626a;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        border: 1px solid rgba(74, 47, 53, 0.2);
+        padding: 0.85rem 1.25rem;
+        box-shadow: none;
+        background: rgba(249, 229, 236, 0.4);
+    }
+
+        .form-control:focus {
+            border-color: rgba(250, 110, 130, 0.7);
+            box-shadow: 0 0 0 0.2rem rgba(250, 110, 130, 0.15);
+        }
+
+    .btn-place-order {
+        background: rgb(250, 110, 130);
+        border: none;
+        color: #fff;
+        border-radius: 999px;
+        padding: 1rem 3.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.2rem;
+        font-weight: 600;
+        box-shadow: 0 25px 45px rgba(250, 110, 130, 0.35);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+
+        .btn-place-order:hover,
+        .btn-place-order:focus {
+            color: #fff;
+            transform: scale(1.04);
+            box-shadow: 0 30px 60px rgba(250, 110, 130, 0.4);
+        }
+</style>
+
+<div class="checkout-wrapper container py-4">
+    <div class="mb-4 text-center text-md-start">
+        <p class="text-uppercase text-muted mb-1">Final Touches</p>
+        <h1 class="fw-semibold">Checkout</h1>
+    </div>
+
+    <form asp-action="PlaceOrder" asp-controller="Cart" method="post">
+        @Html.AntiForgeryToken()
+
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <!-- Delivery Address -->
+        <div class="mb-4">
+            <h2 class="checkout-section-title">Delivery Address</h2>
+            <div class="mb-3">
+                <label asp-for="StreetAddress" class="form-label">Street Address</label>
+                <input asp-for="StreetAddress" type="text" class="form-control" />
+                <span asp-validation-for="StreetAddress" class="text-danger"></span>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="City" class="form-label">City</label>
+                    <input asp-for="City" type="text" class="form-control" />
+                    <span asp-validation-for="City" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="ZipCode" class="form-label">Zip Code</label>
+                    <input asp-for="ZipCode" type="text" class="form-control" />
+                    <span asp-validation-for="ZipCode" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Information -->
+        <div class="mb-4">
+            <h2 class="checkout-section-title">Payment Information</h2>
+            <div class="mb-3">
+                <label asp-for="CardNumber" class="form-label">Credit Card Number</label>
+                <input asp-for="CardNumber" type="text" class="form-control" inputmode="numeric" />
+                <span asp-validation-for="CardNumber" class="text-danger"></span>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="ExpiryDate" class="form-label">Expiry Date</label>
+                    <input asp-for="ExpiryDate" type="text" class="form-control" placeholder="MM/YY" />
+                    <span asp-validation-for="ExpiryDate" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Cvc" class="form-label">CVC</label>
+                    <input asp-for="Cvc" type="text" class="form-control" inputmode="numeric" />
+                    <span asp-validation-for="Cvc" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center text-md-end">
+            <button type="submit" class="btn btn-place-order">Place Order</button>
+        </div>
+    </form>
+
+    @section Scripts {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+    }
+</div>
+

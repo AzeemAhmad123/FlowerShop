@@ -1,0 +1,194 @@
+﻿@model List<FlowerShop.Models.Client>
+@{
+    ViewData["Title"] = "Manage Users";
+}
+
+<style>
+    .admin-users-wrapper {
+        padding: 2rem;
+    }
+
+    .admin-section {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+
+        .admin-section h2 {
+            color: #3d2c32;
+            margin-bottom: 1.5rem;
+            border-bottom: 3px solid #f2a0ac;
+            padding-bottom: 0.5rem;
+        }
+
+    .users-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+    }
+
+        .users-table th {
+            background: #f8f9fa;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #3d2c32;
+            border-bottom: 2px solid #f2a0ac;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.05rem;
+        }
+
+        .users-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+            color: #3d2c32;
+        }
+
+        .users-table tr:hover {
+            background: #f8f9fa;
+        }
+
+    .user-id {
+        font-family: monospace;
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+
+    .delete-btn {
+        padding: 0.5rem 1.5rem;
+        background: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-size: 0.9rem;
+    }
+
+        .delete-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+        }
+
+    .alert {
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+    }
+
+    .no-users {
+        text-align: center;
+        padding: 3rem;
+        color: #8a6c75;
+    }
+
+    .back-btn {
+        padding: 0.8rem 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s;
+        display: inline-block;
+    }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+</style>
+
+<div class="admin-users-wrapper">
+    <div class="mb-4">
+        <h1 class="display-6 fw-semibold">Manage Users</h1>
+        <p class="text-muted">View and manage all registered users</p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="admin-section">
+        <h2>All Users</h2>
+
+        @if (Model != null && Model.Any())
+        {
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th>User ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Gender</th>
+                        <th>Age</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        <tr>
+                            <td>
+                                <span class="user-id">@user.Id</span>
+                            </td>
+                            <td>@user.FirstName</td>
+                            <td>@user.Email</td>
+                            <td>@user.Gender</td>
+                            <td>@user.Age</td>
+                            <td>
+                                <form asp-action="DeleteUser" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@user.Id" />
+                                    <button type="submit" class="delete-btn" onclick="return confirm('Are you sure you want to delete user @user.Email? This will also delete all their orders. This action cannot be undone.');">
+                                        Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="no-users">
+                <p>No users found.</p>
+            </div>
+        }
+    </div>
+
+    <div class="mt-3">
+        <a asp-action="Index" class="back-btn">Back to Dashboard</a>
+    </div>
+</div>
+
+

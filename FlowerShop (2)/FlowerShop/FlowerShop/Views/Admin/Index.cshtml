@@ -1,0 +1,106 @@
+﻿@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<style>
+    .admin-dashboard {
+        padding: 2rem;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(242, 160, 172, 0.2);
+    }
+
+    .stat-label {
+        text-transform: uppercase;
+        letter-spacing: 0.1rem;
+        font-size: 0.85rem;
+        color: #8a6c75;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #f2a0ac;
+    }
+
+    .admin-section {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+    }
+
+        .admin-section h2 {
+            color: #3d2c32;
+            margin-bottom: 1.5rem;
+            border-bottom: 3px solid #f2a0ac;
+            padding-bottom: 0.5rem;
+        }
+
+    .admin-link {
+        display: inline-block;
+        padding: 0.8rem 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s;
+        margin-right: 1rem;
+        margin-bottom: 1rem;
+    }
+
+        .admin-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+</style>
+
+<div class="admin-dashboard">
+    <div class="mb-4">
+        <h1 class="display-6 fw-semibold">Admin Dashboard</h1>
+        <p class="text-muted">Manage your flower shop</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Orders</div>
+            <div class="stat-value">@ViewBag.TotalOrders</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Total Products</div>
+            <div class="stat-value">@ViewBag.TotalProducts</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Total Users</div>
+            <div class="stat-value">@ViewBag.TotalUsers</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Pending Orders</div>
+            <div class="stat-value">@ViewBag.PendingOrders</div>
+        </div>
+    </div>
+
+    <div class="admin-section">
+        <h2>Quick Actions</h2>
+        <a asp-action="Orders" class="admin-link">Manage Orders</a>
+        <a asp-action="Users" class="admin-link">Manage Users</a>
+        <a asp-controller="Shop" asp-action="Index" class="admin-link">View Products</a>
+    </div>
+</div>
+

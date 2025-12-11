@@ -1,0 +1,224 @@
+﻿@model List<FlowerShop.Models.OrderHistoryViewModel>
+@{
+    ViewData["Title"] = "Order History";
+}
+
+<style>
+    .order-history-wrapper {
+        font-family: 'Playfair Display', 'Work Sans', sans-serif;
+    }
+
+    .order-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 28px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 25px 60px rgba(74, 47, 53, 0.12);
+        border: 1px solid rgba(242, 160, 172, 0.2);
+    }
+
+    .order-card-header {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 1rem;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .order-label {
+        text-transform: uppercase;
+        letter-spacing: 0.12rem;
+        font-size: 0.75rem;
+        color: #8a6c75;
+    }
+
+    .order-value {
+        font-size: 1.1rem;
+        color: #3d2c32;
+    }
+
+    .order-status {
+        padding: 0.4rem 1.5rem;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: #fff;
+    }
+
+    .status-delivered {
+        background: #74c69d;
+        box-shadow: 0 10px 25px rgba(116, 198, 157, 0.35);
+    }
+
+    .status-out {
+        background: #ffb347;
+        box-shadow: 0 10px 25px rgba(255, 179, 71, 0.35);
+    }
+
+    .status-processing {
+        background: #957dad;
+        box-shadow: 0 10px 25px rgba(149, 125, 173, 0.35);
+    }
+
+    .status-pending {
+        background: #ffb347;
+        box-shadow: 0 10px 25px rgba(255, 179, 71, 0.35);
+    }
+
+    .status-cancelled {
+        background: #dc3545;
+        box-shadow: 0 10px 25px rgba(220, 53, 69, 0.35);
+    }
+
+    .cancel-btn {
+        border-radius: 999px;
+        border: 1px solid #dc3545;
+        color: #dc3545;
+        text-transform: uppercase;
+        letter-spacing: 0.1rem;
+        padding: 0.6rem 1.8rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        background: transparent;
+        margin-left: 1rem;
+    }
+
+        .cancel-btn:hover,
+        .cancel-btn:focus {
+            background: #dc3545;
+            color: #fff;
+            box-shadow: 0 15px 30px rgba(220, 53, 69, 0.35);
+        }
+
+    .alert {
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+    }
+
+    .no-orders {
+        text-align: center;
+        padding: 3rem;
+        color: #8a6c75;
+    }
+
+    .order-details-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .track-btn {
+        border-radius: 999px;
+        border: 1px solid #f2a0ac;
+        color: #f2a0ac;
+        text-transform: uppercase;
+        letter-spacing: 0.1rem;
+        padding: 0.6rem 1.8rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+        .track-btn:hover,
+        .track-btn:focus {
+            background: #f2a0ac;
+            color: #fff;
+            box-shadow: 0 15px 30px rgba(242, 160, 172, 0.35);
+        }
+</style>
+
+<div class="order-history-wrapper container py-4">
+    <div class="mb-4 text-center text-md-start">
+        <p class="text-uppercase text-muted mb-1">Client Portal</p>
+        <h1 class="fw-semibold">My Orders / Order History</h1>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var orderViewModel in Model)
+        {
+            var order = orderViewModel.Order;
+            var statusClass = order.Status.ToLower() switch
+            {
+                "delivered" => "status-delivered",
+                "out for delivery" => "status-out",
+                "processing" => "status-processing",
+                "pending" => "status-pending",
+                "cancelled" => "status-cancelled",
+                _ => "status-processing"
+            };
+
+            <div class="order-card">
+                <div class="order-card-header">
+                    <div>
+                        <div class="order-label">Order ID</div>
+                        <div class="order-value">#@order.Id</div>
+                    </div>
+                    <span class="order-status @statusClass">@order.Status</span>
+                </div>
+                <div class="order-details-grid">
+                    <div>
+                        <div class="order-label">Date Placed</div>
+                        <div class="order-value">@order.OrderDate.ToString("yyyy-MM-dd")</div>
+                    </div>
+                    <div>
+                        <div class="order-label">Total Amount</div>
+                        <div class="order-value">$@order.TotalAmount.ToString("F2")</div>
+                    </div>
+                    <div>
+                        <div class="order-label">Items</div>
+                        <div class="order-value">@orderViewModel.OrderDetails.Count item(s)</div>
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <a asp-action="TrackDelivery" asp-controller="Order" asp-route-id="@order.Id" class="btn track-btn">Track Delivery</a>
+                    @if (order.Status != "Delivered" && order.Status != "Cancelled")
+                    {
+                        <form asp-action="CancelOrder" asp-controller="Order" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@order.Id" />
+                            <button type="submit" class="btn cancel-btn" onclick="return confirm('Are you sure you want to cancel this order?');">
+                                Cancel Order
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="no-orders">
+            <p>You have no orders yet.</p>
+            <a asp-controller="Shop" asp-action="Index" class="btn track-btn">Start Shopping</a>
+        </div>
+    }
+</div>

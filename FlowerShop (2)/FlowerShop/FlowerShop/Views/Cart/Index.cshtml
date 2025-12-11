@@ -1,0 +1,304 @@
+﻿@model List<FlowerShop.Models.CartItem>
+@{
+    ViewData["Title"] = "Shopping Cart";
+    var grandTotal = ViewBag.GrandTotal ?? 0m;
+}
+
+<style>
+    .cart-page {
+        font-family: 'Playfair Display', 'Work Sans', sans-serif;
+    }
+
+    .cart-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 28px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 25px 50px rgba(74, 47, 53, 0.12);
+        border: 1px solid rgba(242, 160, 172, 0.15);
+    }
+
+    .cart-item {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr auto;
+        gap: 1rem;
+        align-items: center;
+        padding: 1.25rem 0;
+        border-bottom: 1px solid rgba(58, 47, 53, 0.08);
+    }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+    .cart-item-name {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.2rem;
+        color: #4a2f35;
+    }
+
+    .cart-item-price,
+    .cart-item-subtotal {
+        font-weight: 600;
+        color: #6b4e56;
+        text-align: right;
+    }
+
+    .cart-quantity input {
+        border-radius: 999px;
+    }
+
+    .cart-total-box {
+        background: rgba(250, 110, 130, 0.08);
+        border-radius: 24px;
+        padding: 1.5rem;
+        border: 2px solid rgba(250, 110, 130, 0.4);
+        text-align: right;
+    }
+
+    .cart-total-label {
+        text-transform: uppercase;
+        letter-spacing: 0.15rem;
+        font-size: 0.85rem;
+        color: #7a4b53;
+    }
+
+    .cart-total-value {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #fa6e82;
+    }
+
+    .btn-update {
+        border-radius: 999px;
+        border: 1px solid rgba(74, 47, 53, 0.3);
+        color: #4a2f35;
+        background: transparent;
+        padding: 0.75rem 2.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12rem;
+        font-weight: 600;
+    }
+
+        .btn-update:hover,
+        .btn-update:focus {
+            background: rgba(74, 47, 53, 0.05);
+        }
+
+    .btn-checkout {
+        background: rgb(250, 110, 130);
+        border: none;
+        color: #fff;
+        border-radius: 999px;
+        padding: 0.9rem 3rem;
+        text-transform: uppercase;
+        letter-spacing: 0.15rem;
+        font-weight: 600;
+        box-shadow: 0 20px 35px rgba(250, 110, 130, 0.35);
+    }
+
+        .btn-checkout:hover,
+        .btn-checkout:focus {
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+    .btn-remove {
+        background: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+        .btn-remove:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+    .alert {
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+    }
+</style>
+
+<div class="cart-page container py-4">
+    <div class="mb-4 text-center text-md-start">
+        <p class="text-uppercase text-muted mb-1">Your Selections</p>
+        <h1 class="fw-semibold">Shopping Cart</h1>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (Model != null && Model.Any())
+    {
+        @Html.AntiForgeryToken()
+        <div class="cart-card">
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                var item = Model[i];
+                <div class="cart-item">
+                    <div class="cart-item-name">@item.ProductName</div>
+                    <div class="cart-item-price">$@item.Price.ToString("F2")</div>
+                    <div class="cart-quantity">
+                        <input type="number"
+                               class="form-control text-center quantity-input"
+                               min="0"
+                               value="@item.Quantity"
+                               data-product-id="@item.ProductId"
+                               onchange="updateCartQuantity(@item.ProductId, this.value)" />
+                    </div>
+                    <div class="cart-item-subtotal" id="subtotal-@item.ProductId">$@item.Subtotal.ToString("F2")</div>
+                    <div>
+                        <form asp-action="RemoveFromCart" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="productId" value="@item.ProductId" />
+                            <button type="submit"
+                                    class="btn btn-remove"
+                                    onclick="return confirm('Remove @item.ProductName from cart?');">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="cart-total-box mb-4">
+            <div class="cart-total-label">Grand Total</div>
+            <div class="cart-total-value" id="grandTotal">$@grandTotal.ToString("F2")</div>
+        </div>
+
+        <div class="d-flex flex-column flex-md-row justify-content-end gap-3">
+            <a class="btn btn-checkout" asp-controller="Cart" asp-action="Checkout">
+                Proceed to Checkout
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="cart-card text-center py-5">
+            <p class="text-muted mb-4">Your cart is empty.</p>
+            <a asp-controller="Shop" asp-action="Index" class="btn btn-checkout">Start Shopping</a>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        var updateTimeout;
+
+        function updateCartQuantity(productId, quantity) {
+            // Clear any pending updates
+            clearTimeout(updateTimeout);
+
+            // Ensure quantity is at least 0
+            if (quantity < 0) {
+                quantity = 0;
+                $('.quantity-input[data-product-id="' + productId + '"]').val(0);
+            }
+
+            // Recalculate subtotal for this item
+            var item = $('.quantity-input[data-product-id="' + productId + '"]').closest('.cart-item');
+            var price = parseFloat(item.find('.cart-item-price').text().replace('$', ''));
+            var subtotal = price * quantity;
+            $('#subtotal-' + productId).text('$' + subtotal.toFixed(2));
+
+            // If quantity is 0, visually indicate it will be removed
+            if (quantity == 0) {
+                item.css('opacity', '0.5');
+            } else {
+                item.css('opacity', '1');
+            }
+
+            // Recalculate grand total (only for items with quantity > 0)
+            var grandTotal = 0;
+            $('.cart-item').each(function () {
+                var qty = parseFloat($(this).find('.quantity-input').val());
+                if (qty > 0) {
+                    var subtotal = parseFloat($(this).find('.cart-item-subtotal').text().replace('$', ''));
+                    grandTotal += subtotal;
+                }
+            });
+            $('#grandTotal').text('$' + grandTotal.toFixed(2));
+
+            // Auto-update cart after user stops typing (debounce)
+            updateTimeout = setTimeout(function () {
+                updateCartInSession();
+            }, 1000);
+        }
+
+        function updateCartInSession() {
+            // Build quantities object
+            var quantities = {};
+            $('.quantity-input').each(function () {
+                var productId = $(this).data('product-id');
+                var quantity = parseInt($(this).val()) || 0;
+                if (quantity > 0) {
+                    quantities[productId] = quantity;
+                }
+            });
+
+            // Send AJAX request to update cart with CSRF protection
+            var token = $('input[name="__RequestVerificationToken"]').val();
+            $.ajax({
+                url: '@Url.Action("UpdateCartAjax", "Cart")',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ quantities: quantities }),
+                headers: {
+                    'RequestVerificationToken': token,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                success: function (response) {
+                    if (response.success) {
+                        // Remove items with quantity 0 from DOM
+                        $('.cart-item').each(function () {
+                            var qty = parseInt($(this).find('.quantity-input').val()) || 0;
+                            if (qty == 0) {
+                                $(this).fadeOut(300, function () {
+                                    $(this).remove();
+                                    // Recalculate grand total
+                                    var grandTotal = 0;
+                                    $('.cart-item').each(function () {
+                                        var subtotal = parseFloat($(this).find('.cart-item-subtotal').text().replace('$', ''));
+                                        grandTotal += subtotal;
+                                    });
+                                    $('#grandTotal').text('$' + grandTotal.toFixed(2));
+
+                                    // Check if cart is empty
+                                    if ($('.cart-item').length == 0) {
+                                        location.reload();
+                                    }
+                                });
+                            }
+                        });
+
+                        // Update cart badge
+                        updateCartBadge();
+                    }
+                },
+                error: function () {
+                    console.log('Failed to update cart');
+                }
+            });
+        }
+    </script>
+}
+</div>

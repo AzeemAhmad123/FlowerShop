@@ -1,0 +1,297 @@
+﻿@model FlowerShop.Models.OrderHistoryViewModel
+@{
+    ViewData["Title"] = "Track Delivery";
+}
+
+<style>
+    .track-delivery-wrapper {
+        padding: 2rem;
+        font-family: 'Playfair Display', 'Work Sans', sans-serif;
+    }
+
+    .track-card {
+        background: white;
+        border-radius: 28px;
+        padding: 2rem;
+        box-shadow: 0 25px 60px rgba(74, 47, 53, 0.12);
+        border: 1px solid rgba(242, 160, 172, 0.2);
+        margin-bottom: 2rem;
+    }
+
+    .track-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 3px solid #f2a0ac;
+    }
+
+        .track-header h1 {
+            color: #3d2c32;
+            margin-bottom: 0.5rem;
+        }
+
+    .order-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .info-item {
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 10px;
+        border-left: 4px solid #f2a0ac;
+    }
+
+    .info-label {
+        text-transform: uppercase;
+        letter-spacing: 0.1rem;
+        font-size: 0.75rem;
+        color: #8a6c75;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+
+    .info-value {
+        font-size: 1.1rem;
+        color: #3d2c32;
+        font-weight: 500;
+    }
+
+    .status-badge {
+        padding: 0.6rem 1.5rem;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 1rem;
+        color: #fff;
+        display: inline-block;
+        text-align: center;
+        margin: 1rem 0;
+    }
+
+    .status-pending {
+        background: #ffb347;
+        box-shadow: 0 10px 25px rgba(255, 179, 71, 0.35);
+    }
+
+    .status-processing {
+        background: #957dad;
+        box-shadow: 0 10px 25px rgba(149, 125, 173, 0.35);
+    }
+
+    .status-delivered {
+        background: #74c69d;
+        box-shadow: 0 10px 25px rgba(116, 198, 157, 0.35);
+    }
+
+    .status-cancelled {
+        background: #dc3545;
+        box-shadow: 0 10px 25px rgba(220, 53, 69, 0.35);
+    }
+
+    .status-out {
+        background: #ffb347;
+        box-shadow: 0 10px 25px rgba(255, 179, 71, 0.35);
+    }
+
+    .timeline {
+        margin-top: 2rem;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 15px;
+    }
+
+    .timeline-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem 0;
+        border-left: 3px solid #e0e0e0;
+        padding-left: 1.5rem;
+        margin-left: 1rem;
+        position: relative;
+    }
+
+        .timeline-item.active {
+            border-left-color: #f2a0ac;
+        }
+
+        .timeline-item.completed {
+            border-left-color: #74c69d;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -8px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            border: 3px solid white;
+        }
+
+        .timeline-item.active::before {
+            background: #f2a0ac;
+        }
+
+        .timeline-item.completed::before {
+            background: #74c69d;
+        }
+
+    .timeline-content {
+        margin-left: 1rem;
+    }
+
+    .timeline-title {
+        font-weight: 600;
+        color: #3d2c32;
+        margin-bottom: 0.25rem;
+    }
+
+    .timeline-date {
+        font-size: 0.85rem;
+        color: #8a6c75;
+    }
+
+    .back-btn {
+        padding: 0.8rem 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s;
+        display: inline-block;
+    }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+</style>
+
+<div class="track-delivery-wrapper container py-4">
+    <div class="track-card">
+        <div class="track-header">
+            <h1>Track Your Order</h1>
+            <p class="text-muted">Order #@Model.Order.Id</p>
+        </div>
+
+        <div class="order-info">
+            <div class="info-item">
+                <div class="info-label">Order ID</div>
+                <div class="info-value">#@Model.Order.Id</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Date Placed</div>
+                <div class="info-value">@Model.Order.OrderDate.ToString("MMMM dd, yyyy")</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Total Amount</div>
+                <div class="info-value">$@Model.Order.TotalAmount.ToString("F2")</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Items</div>
+                <div class="info-value">@Model.OrderDetails.Count item(s)</div>
+            </div>
+        </div>
+
+        @{
+            var statusClass = Model.Order.Status.ToLower() switch
+            {
+                "pending" => "status-pending",
+                "processing" => "status-processing",
+                "delivered" => "status-delivered",
+                "cancelled" => "status-cancelled",
+                "out for delivery" => "status-out",
+                _ => "status-pending"
+            };
+        }
+
+        <div class="text-center">
+            <span class="status-badge @statusClass">@Model.Order.Status</span>
+        </div>
+
+        <div class="timeline">
+            <h3 style="color: #3d2c32; margin-bottom: 1.5rem;">Delivery Timeline</h3>
+
+            @{
+                var status = Model.Order.Status.ToLower();
+                var orderDate = Model.Order.OrderDate;
+            }
+
+            <div class="timeline-item @(status != "pending" ? "completed" : "active")">
+                <div class="timeline-content">
+                    <div class="timeline-title">Order Placed</div>
+                    <div class="timeline-date">@orderDate.ToString("MMMM dd, yyyy 'at' hh:mm tt")</div>
+                </div>
+            </div>
+
+            <div class="timeline-item @(status == "processing" || status == "out for delivery" || status == "delivered" ? (status == "processing" ? "active" : "completed") : "")">
+                <div class="timeline-content">
+                    <div class="timeline-title">Order Processing</div>
+                    <div class="timeline-date">
+                        @if (status == "processing" || status == "out for delivery" || status == "delivered")
+                        {
+                            <text>In Progress</text>
+                        }
+                        else
+                        {
+                            <text>Pending</text>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-item @(status == "out for delivery" || status == "delivered" ? (status == "out for delivery" ? "active" : "completed") : "")">
+                <div class="timeline-content">
+                    <div class="timeline-title">Out for Delivery</div>
+                    <div class="timeline-date">
+                        @if (status == "out for delivery" || status == "delivered")
+                        {
+                            <text>On the way</text>
+                        }
+                        else
+                        {
+                            <text>Not yet shipped</text>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-item @(status == "delivered" ? "completed" : "")">
+                <div class="timeline-content">
+                    <div class="timeline-title">Delivered</div>
+                    <div class="timeline-date">
+                        @if (status == "delivered")
+                        {
+                            <text>Delivered successfully</text>
+                        }
+                        else
+                        {
+                            <text>Awaiting delivery</text>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            @if (status == "cancelled")
+            {
+                <div class="timeline-item active">
+                    <div class="timeline-content">
+                        <div class="timeline-title">Order Cancelled</div>
+                        <div class="timeline-date">This order has been cancelled</div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="text-center mt-4">
+            <a asp-action="History" class="back-btn">Back to Order History</a>
+        </div>
+    </div>
+</div>
+
+

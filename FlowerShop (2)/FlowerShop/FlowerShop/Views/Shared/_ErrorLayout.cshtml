@@ -1,0 +1,50 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Error - FlowerShop</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Work+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        :root {
+            --petal-blush: #f9e5ec;
+            --petal-rose: #f3cfe0;
+            --sage-green: #b3d2c8;
+            --deep-sage: #3d5c53;
+            --text-main: #2f2a2b;
+            --accent-pink: rgb(250, 110, 130); /* Your custom Rose Pink */
+        }
+
+        body {
+            /* Ensures the elegant background gradient is kept */
+            background: linear-gradient(180deg, var(--petal-blush) 0%, #ffffff 35%, #fef7fa 100%);
+            font-family: 'Work Sans', Arial, sans-serif;
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+        /* Style for the main error container to center it */
+        .error-container {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        @RenderBody()
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
